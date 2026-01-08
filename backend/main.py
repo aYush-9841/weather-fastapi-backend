@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi import Query, HTTPException
 from pydantic import BaseModel
-import httpx
+import httpx, os
+from dotenv import load_dotenv
+load_dotenv()
+
 app = FastAPI()
 
 class FavoriteLocation(BaseModel):
@@ -11,7 +14,10 @@ class FavoriteLocation(BaseModel):
 
 @app.get("/weather/{city}")
 async def get_weather(city:str, unit:str = "celsius", days:int = Query(default=3, le=14)): #le stands for less than
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid=YOUR_API_KEY"
+
+     #  
+    api_key = os.getenv("OPENWEATHER_API_KEY", "YOUR_API_KEY_PLACEHOLDER")
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
 
     async with httpx.AsyncClient() as client:
        response = await client.get(url)
